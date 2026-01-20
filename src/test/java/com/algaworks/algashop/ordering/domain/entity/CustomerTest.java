@@ -104,4 +104,45 @@ class CustomerTest {
                 .isThrownBy(customer::disablePromotionNotifications);
     }
 
+    @Test
+    void given_brandNewCustomer_whenAddLoyaltyPoints_ShouldSumPoints() {
+        Customer customer = new Customer(
+                IdGenerator.generateTimeBasedUUID(),
+                "John Doe",
+                LocalDate.of(1991, 7, 5),
+                "john.doe@gmail.com",
+                "478-256-2504",
+                "255-08-0578",
+                false,
+                OffsetDateTime.now()
+        );
+
+        customer.addLoyaltyPoints(20);
+        customer.addLoyaltyPoints(10);
+
+        assertThat(customer.loyaltyPoints()).isEqualTo(30);
+
+    }
+
+    @Test
+    void given_brandNewCustomer_whenAddInvalidLoyaltyPoints_ShouldGenerationException() {
+        Customer customer = new Customer(
+                IdGenerator.generateTimeBasedUUID(),
+                "John Doe",
+                LocalDate.of(1991, 7, 5),
+                "john.doe@gmail.com",
+                "478-256-2504",
+                "255-08-0578",
+                false,
+                OffsetDateTime.now()
+        );
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> customer.addLoyaltyPoints(0));
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> customer.addLoyaltyPoints(-10));
+
+    }
+
 }
