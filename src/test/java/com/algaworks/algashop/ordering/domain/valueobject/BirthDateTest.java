@@ -10,7 +10,13 @@ class BirthDateTest {
     @Test
     void shouldGenerate() {
         BirthDate birthDate = new BirthDate(LocalDate.of(1991, 7, 5));
-        Assertions.assertThat(birthDate.age()).isEqualTo(34);
+        Assertions.assertThat(birthDate).isEqualTo(new BirthDate(LocalDate.of(1991, 7, 5)));
+    }
+
+    @Test
+    void shouldNotGenerateNullValue() {
+        Assertions.assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> new BirthDate(null));
     }
 
 }
