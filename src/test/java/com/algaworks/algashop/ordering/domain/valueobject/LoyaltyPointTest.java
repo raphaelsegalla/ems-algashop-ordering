@@ -35,4 +35,10 @@ class LoyaltyPointTest {
         Assertions.assertThat(loyaltyPoint.value()).isEqualTo(10);
     }
 
+    @Test
+    void shouldGenerateAndReturnToString() {
+        LoyaltyPoint loyaltyPoint = new LoyaltyPoint(10);
+        Assertions.assertThat(loyaltyPoint.toString()).hasToString("10");
+    }
+
 }
