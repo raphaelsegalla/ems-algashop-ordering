@@ -6,9 +6,9 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public class CustomertestDataBuilder {
+public class CustomerTestDataBuilder {
 
-    private CustomertestDataBuilder() {}
+    private CustomerTestDataBuilder() {}
 
     public static Customer.BrandNewCustomerBuild brandNewCustomer() {
         return Customer.brandNew()

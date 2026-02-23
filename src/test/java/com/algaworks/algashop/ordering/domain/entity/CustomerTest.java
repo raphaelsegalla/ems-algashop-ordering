@@ -13,7 +13,7 @@ class CustomerTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> {
-                    CustomertestDataBuilder.brandNewCustomer()
+                    CustomerTestDataBuilder.brandNewCustomer()
                             .email(new Email("invalid"))
                             .build();
                 });
@@ -21,7 +21,7 @@ class CustomerTest {
 
     @Test
     void given_invalidEmail_whenTryUpdatedCreateCustomerEmail_ShouldGenerateException() {
-        Customer customer = CustomertestDataBuilder.brandNewCustomer().build();
+        Customer customer = CustomerTestDataBuilder.brandNewCustomer().build();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> {
@@ -31,7 +31,7 @@ class CustomerTest {
 
     @Test
     void given_unarchivedCustomer_whenArchive_ShouldAnonymize() {
-        Customer customer = CustomertestDataBuilder.existingCustomer().build();
+        Customer customer = CustomerTestDataBuilder.existingCustomer().build();
 
         customer.archive();
 
@@ -58,7 +58,7 @@ class CustomerTest {
 
     @Test
     void given_archivedCustomer_whenTryToUpdate_ShouldGenerateException() {
-        Customer customer = CustomertestDataBuilder.existingAnonymizedCustomer().build();
+        Customer customer = CustomerTestDataBuilder.existingAnonymizedCustomer().build();
 
         assertThatExceptionOfType(CustomerArchivedException.class)
                 .isThrownBy(customer::archive);
@@ -74,7 +74,7 @@ class CustomerTest {
 
     @Test
     void given_brandNewCustomer_whenAddLoyaltyPoints_ShouldSumPoints() {
-        Customer customer = CustomertestDataBuilder.brandNewCustomer().build();
+        Customer customer = CustomerTestDataBuilder.brandNewCustomer().build();
 
         customer.addLoyaltyPoints(new LoyaltyPoint(20));
         customer.addLoyaltyPoints(new LoyaltyPoint(10));
@@ -85,7 +85,7 @@ class CustomerTest {
 
     @Test
     void given_brandNewCustomer_whenAddInvalidLoyaltyPoints_ShouldGenerationException() {
-        Customer customer = CustomertestDataBuilder.brandNewCustomer().build();
+        Customer customer = CustomerTestDataBuilder.brandNewCustomer().build();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> customer.addLoyaltyPoints(new LoyaltyPoint(0)));

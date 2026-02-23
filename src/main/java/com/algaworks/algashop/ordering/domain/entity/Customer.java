@@ -11,6 +11,7 @@ import java.util.UUID;
 import static com.algaworks.algashop.ordering.domain.exception.ErrorMessages.VALIDATION_ERROR_FULLNAME_IS_NULL;
 
 public class Customer {
+
     private CustomerId id;
     private FullName fullName;
     private BirthDate birthDate;
