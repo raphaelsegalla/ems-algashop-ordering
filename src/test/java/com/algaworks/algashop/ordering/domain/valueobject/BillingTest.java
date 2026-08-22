@@ -3,11 +3,11 @@ package com.algaworks.algashop.ordering.domain.valueobject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class BillingInfoTest {
+class BillingTest {
 
     @Test
     void shouldGenerate() {
-        BillingInfo billingInfo = BillingInfo.builder()
+        Billing billing = Billing.builder()
                 .fullName(new FullName("John", "Doe"))
                 .document(new Document("255-08-0578"))
                 .phone(new Phone("478-256-2504"))
@@ -21,7 +21,7 @@ class BillingInfoTest {
                         .complement("Apt. 114")
                         .build())
                 .build();
-        Assertions.assertThat(billingInfo).isEqualTo(BillingInfo.builder()
+        Assertions.assertThat(billing).isEqualTo(Billing.builder()
                 .fullName(new FullName("John", "Doe"))
                 .document(new Document("255-08-0578"))
                 .phone(new Phone("478-256-2504"))
@@ -39,7 +39,7 @@ class BillingInfoTest {
 
     @Test
     void shouldNotEqualWhenFullNameDifference() {
-        BillingInfo billingInfo = BillingInfo.builder()
+        Billing billing = Billing.builder()
                 .fullName(new FullName("John", "Doe"))
                 .document(new Document("255-08-0578"))
                 .phone(new Phone("478-256-2504"))
@@ -53,7 +53,7 @@ class BillingInfoTest {
                         .complement("Apt. 114")
                         .build())
                 .build();
-        Assertions.assertThat(billingInfo).isNotEqualTo(BillingInfo.builder()
+        Assertions.assertThat(billing).isNotEqualTo(Billing.builder()
                 .fullName(new FullName("Raphael", "Fernando"))
                 .document(new Document("255-08-0578"))
                 .phone(new Phone("478-256-2504"))
@@ -72,7 +72,7 @@ class BillingInfoTest {
     @Test
     void shouldNotGenerateWhenFieldNull() {
         Assertions.assertThatExceptionOfType(NullPointerException.class)
-                .isThrownBy(() -> BillingInfo.builder()
+                .isThrownBy(() -> Billing.builder()
                         .fullName(null)
                         .document(new Document("255-08-0578"))
                         .phone(new Phone("478-256-2504"))
