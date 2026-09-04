@@ -8,8 +8,7 @@ import java.util.UUID;
 
 public class IdGenerator {
 
-    private static final TimeBasedEpochRandomGenerator timeBasedEpochRandomGenerator
-            = Generators.timeBasedEpochRandomGenerator();
+    private static final TimeBasedEpochRandomGenerator timeBasedEpochRandomGenerator = Generators.timeBasedEpochRandomGenerator();
 
     private static final TSID.Factory tsidFactory = TSID.Factory.INSTANCE;
 

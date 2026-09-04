@@ -27,7 +27,7 @@ class BirthDateTest {
 
     @Test
     void shouldReturnAge() {
-        BirthDate birthDate = new BirthDate(LocalDate.of(1991, 7, 5));
+        BirthDate birthDate = new BirthDate(LocalDate.of(1991, 9, 5));
         Assertions.assertThat(birthDate.age()).isEqualTo(34);
     }
 

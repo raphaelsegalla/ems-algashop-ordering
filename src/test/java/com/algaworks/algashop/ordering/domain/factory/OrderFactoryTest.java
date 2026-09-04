@@ -28,12 +28,12 @@ class OrderFactoryTest {
         Order order = OrderFactory.filled(customerId, shipping, billing, paymentMethod, product, quantity);
 
         Assertions.assertWith(order,
-                (o) -> Assertions.assertThat(o.customerId()).isEqualTo(customerId),
-                (o) -> Assertions.assertThat(o.shipping()).isEqualTo(shipping),
-                (o) -> Assertions.assertThat(o.billing()).isEqualTo(billing),
-                (o) -> Assertions.assertThat(o.paymentMethod()).isEqualTo(paymentMethod),
-                (o) -> Assertions.assertThat(o.items()).isNotEmpty(),
-                (o) -> Assertions.assertThat(o.isDraft()).isTrue()
+                o -> Assertions.assertThat(o.customerId()).isEqualTo(customerId),
+                o -> Assertions.assertThat(o.shipping()).isEqualTo(shipping),
+                o -> Assertions.assertThat(o.billing()).isEqualTo(billing),
+                o -> Assertions.assertThat(o.paymentMethod()).isEqualTo(paymentMethod),
+                o -> Assertions.assertThat(o.items()).isNotEmpty(),
+                o -> Assertions.assertThat(o.isDraft()).isTrue()
         );
 
         order.place();

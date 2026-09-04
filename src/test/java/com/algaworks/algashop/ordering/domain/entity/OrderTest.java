@@ -1,5 +1,6 @@
 package com.algaworks.algashop.ordering.domain.entity;
 
+import com.algaworks.algashop.ordering.domain.exception.OrderCannotBeEditedException;
 import com.algaworks.algashop.ordering.domain.exception.OrderInvalidShippingDeliveryDateException;
 import com.algaworks.algashop.ordering.domain.exception.OrderStatusCannotBeChangedException;
 import com.algaworks.algashop.ordering.domain.exception.ProductOutOfStockException;
@@ -192,6 +193,71 @@ class OrderTest {
         ThrowableAssert.ThrowingCallable addItemTask = () -> order.addItem(ProductTestDataBuilder.aProductUnavailable().build(), new Quantity(1));
 
         assertThatExceptionOfType(ProductOutOfStockException.class)
+                .isThrownBy(addItemTask);
+    }
+
+    @Test
+    void givenDraftOrder_whenChangeItemShippingBillingPayment_shouldNotError() {
+        Order order = Order.draft(new CustomerId());
+        Billing billing = OrderTestDataBuilder.aBilling();
+        Shipping shipping = OrderTestDataBuilder.aShipping();
+        order.addItem(
+                ProductTestDataBuilder.aProductAltMousePad().build(),
+                new Quantity(5)
+        );
+        order.changePaymentMethod(PaymentMethod.CREDIT_CARD);
+        order.changeBilling(billing);
+        order.changeShipping(shipping);
+
+        Assertions.assertWith(order,
+                o -> Assertions.assertThat(o.totalAmount()).isEqualTo(new Money("500.00")),
+                o -> Assertions.assertThat(o.totalItems()).isEqualTo(new Quantity(5)),
+                o -> Assertions.assertThat(o.paymentMethod()).isEqualTo(PaymentMethod.CREDIT_CARD),
+                o -> Assertions.assertThat(o).isNotNull(),
+                o -> Assertions.assertThat(o.shipping()).isNotNull(),
+                o -> Assertions.assertThat(o.billing()).isNotNull()
+        );
+    }
+
+    @Test
+    void givenPlacedOrder_whenTryToAddItem_shouldNotAllow() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
+
+        ThrowableAssert.ThrowingCallable addItemTask = () -> order.addItem(ProductTestDataBuilder.aProductUnavailable().build(), new Quantity(1));
+
+        assertThatExceptionOfType(OrderCannotBeEditedException.class)
+                .isThrownBy(addItemTask);
+    }
+
+    @Test
+    void givenPlacedOrder_whenTryToChangePaymentMethod_shouldNotAllow() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
+
+        ThrowableAssert.ThrowingCallable addItemTask = () -> order.changePaymentMethod(PaymentMethod.CREDIT_CARD);
+
+        assertThatExceptionOfType(OrderCannotBeEditedException.class)
+                .isThrownBy(addItemTask);
+    }
+
+    @Test
+    void givenPlacedOrder_whenTryToChangeShipping_shouldNotAllow() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
+        Shipping shipping = OrderTestDataBuilder.aShipping();
+
+        ThrowableAssert.ThrowingCallable addItemTask = () -> order.changeShipping(shipping);
+
+        assertThatExceptionOfType(OrderCannotBeEditedException.class)
+                .isThrownBy(addItemTask);
+    }
+
+    @Test
+    void givenPlacedOrder_whenTryToChangeBilling_shouldNotAllow() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
+        Billing billing = OrderTestDataBuilder.aBilling();
+
+        ThrowableAssert.ThrowingCallable addItemTask = () -> order.changeBilling(billing);
+
+        assertThatExceptionOfType(OrderCannotBeEditedException.class)
                 .isThrownBy(addItemTask);
     }
 
