@@ -12,8 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @DataJpaTest
 @Import({
@@ -23,10 +28,13 @@ import java.util.Optional;
 class OrdersIT {
 
     private final Orders orders;
+    private final TransactionTemplate newTransaction;
 
     @Autowired
-    public OrdersIT(Orders orders) {
+    public OrdersIT(Orders orders, PlatformTransactionManager transactionManager) {
         this.orders = orders;
+        this.newTransaction = new TransactionTemplate(transactionManager);
+        this.newTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 
     @Test
@@ -69,5 +77,67 @@ class OrdersIT {
         order = orders.ofId(order.id()).orElseThrow();
 
         Assertions.assertThat(order.isPaid()).isTrue();
+    }
+
+    @Test
+    void shouldNotAllowStaleUpdates() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
+        orders.add(order);
+
+        Order order1 = orders.ofId(order.id()).orElseThrow();
+        Order order2 = orders.ofId(order.id()).orElseThrow();
+
+        order1.markAsPaid();
+        orders.add(order1);
+
+        order2.cancel();
+
+        Assertions.assertThatExceptionOfType(ObjectOptimisticLockingFailureException.class)
+                .isThrownBy(() -> orders.add(order2));
+
+        Order savedOrder = orders.ofId(order.id()).orElseThrow();
+
+        Assertions.assertThat(savedOrder.canceledAt()).isNull();
+        Assertions.assertThat(savedOrder.paidAt()).isNotNull();
+    }
+
+    @Test
+    void shouldNotAllowStaleUpdatesReal() {
+        // T0: insere o pedido em transação própria
+        OrderId orderId = inNewTransaction(() -> {
+            Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
+            orders.add(order);
+            return order.id();
+        });
+
+        Assertions.assertThatExceptionOfType(ObjectOptimisticLockingFailureException.class)
+                .isThrownBy(() -> inNewTransaction(() -> {
+                    // T1: carrega o pedido em sua própria transação
+                    Order orderT1 = orders.ofId(orderId).orElseThrow();
+
+                    // T2: em outra transação separada, salva primeiro
+                    inNewTransaction(() -> {
+                        Order orderT2 = orders.ofId(orderId).orElseThrow();
+                        orderT2.markAsPaid();
+                        orders.add(orderT2);
+                    });
+
+                    // T1 tenta salvar com versão obsoleta
+                    orderT1.cancel();
+                    orders.add(orderT1);
+                }));
+
+        // Verifica que a atualização de T2 prevaleceu
+        Order savedOrder = orders.ofId(orderId).orElseThrow();
+        Assertions.assertThat(savedOrder.canceledAt()).isNull();
+        Assertions.assertThat(savedOrder.paidAt()).isNotNull();
+    }
+
+    private <T> T inNewTransaction(Supplier<T> callback) {
+        return newTransaction.execute(status -> callback.get());
+    }
+
+    private void inNewTransaction(Runnable callback) {
+        newTransaction.executeWithoutResult(status -> callback.run());
     }
 }
