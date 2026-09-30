@@ -23,21 +23,25 @@ class OrderPersistenceEntityRepositoryIT {
     }
 
     @Test
-    public void shouldPersist() {
+    void shouldPersist() {
         OrderPersistenceEntity entity = OrderPersistenceEntityTestDataBuilder.existingOrder().build();
 
         orderPersistenceEntityRepository.saveAndFlush(entity);
         Assertions.assertThat(orderPersistenceEntityRepository.existsById(entity.getId())).isTrue();
+
+        OrderPersistenceEntity savedEntity = orderPersistenceEntityRepository.findById(entity.getId()).orElseThrow();
+
+        Assertions.assertThat(savedEntity.getItems()).isNotEmpty();
     }
 
     @Test
-    public void shouldCount() {
+    void shouldCount() {
         long orderCount = orderPersistenceEntityRepository.count();
         Assertions.assertThat(orderCount).isZero();
     }
 
     @Test
-    public void shouldSetAuditingValues() {
+    void shouldSetAuditingValues() {
         OrderPersistenceEntity entity = OrderPersistenceEntityTestDataBuilder.existingOrder().build();
         entity = orderPersistenceEntityRepository.saveAndFlush(entity);
 
