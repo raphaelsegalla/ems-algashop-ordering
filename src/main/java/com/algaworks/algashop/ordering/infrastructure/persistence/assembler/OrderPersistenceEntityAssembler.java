@@ -41,7 +41,7 @@ public class OrderPersistenceEntityAssembler {
         orderPersistenceEntity.setBilling(toBillingEmbeddable(order.billing()));
         orderPersistenceEntity.setShipping(toShippingEmbeddable(order.shipping()));
         Set<OrderItemPersistenceEntity> mergedItems = mergeItems(order, orderPersistenceEntity);
-        orderPersistenceEntity.setItems(mergedItems);
+        orderPersistenceEntity.replaceItems(mergedItems);
         return orderPersistenceEntity;
     }
 
