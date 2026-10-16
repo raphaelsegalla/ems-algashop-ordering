@@ -6,7 +6,7 @@ import com.algaworks.algashop.ordering.domain.model.valueobject.BirthDate;
 import com.algaworks.algashop.ordering.domain.model.valueobject.Document;
 import com.algaworks.algashop.ordering.domain.model.valueobject.Email;
 import com.algaworks.algashop.ordering.domain.model.valueobject.FullName;
-import com.algaworks.algashop.ordering.domain.model.valueobject.LoyaltyPoint;
+import com.algaworks.algashop.ordering.domain.model.valueobject.LoyaltyPoints;
 import com.algaworks.algashop.ordering.domain.model.valueobject.Phone;
 import com.algaworks.algashop.ordering.domain.model.valueobject.id.CustomerId;
 import lombok.Builder;
@@ -29,8 +29,9 @@ public class Customer implements AggregateRoot<CustomerId> {
     private Boolean archived;
     private OffsetDateTime registeredAt;
     private OffsetDateTime archivedAt;
-    private LoyaltyPoint loyaltyPoints;
+    private LoyaltyPoints loyaltyPoints;
     private Address address;
+    private Long version;
 
     @Builder(builderClassName = "BrandNewCustomerBuild", builderMethodName = "brandNew")
     private static Customer createBrandNew(FullName fullName, BirthDate birthDate, Email email, Phone phone,
@@ -39,6 +40,7 @@ public class Customer implements AggregateRoot<CustomerId> {
 
         return new Customer(
                 new CustomerId(),
+                null,
                 fullName,
                 birthDate,
                 email,
@@ -48,16 +50,17 @@ public class Customer implements AggregateRoot<CustomerId> {
                 false,
                 OffsetDateTime.now(),
                 null,
-                LoyaltyPoint.ZERO,
+                LoyaltyPoints.ZERO,
                 address
         );
     }
 
     @Builder(builderClassName = "ExistingCustomerBuild", builderMethodName = "existing")
-    private Customer(CustomerId id, FullName fullName, BirthDate birthDate, Email email, Phone phone,
-                    Document document, Boolean promotionNotificationsAllowed, Boolean archived,
-                    OffsetDateTime registeredAt, OffsetDateTime archivedAt, LoyaltyPoint loyaltyPoints, Address address) {
+    private Customer(CustomerId id, Long version, FullName fullName, BirthDate birthDate, Email email, Phone phone,
+                     Document document, Boolean promotionNotificationsAllowed, Boolean archived,
+                     OffsetDateTime registeredAt, OffsetDateTime archivedAt, LoyaltyPoints loyaltyPoints, Address address) {
         this.setId(id);
+        this.setVersion(version);
         this.setFullName(fullName);
         this.setBirthDate(birthDate);
         this.setEmail(email);
@@ -71,7 +74,7 @@ public class Customer implements AggregateRoot<CustomerId> {
         this.setAddress(address);
     }
 
-    public void addLoyaltyPoints(LoyaltyPoint loayltyPointsAdded) {
+    public void addLoyaltyPoints(LoyaltyPoints loayltyPointsAdded) {
         verifyIfChangeable();
         this.setLoyaltyPoints(this.loyaltyPoints.add(loayltyPointsAdded));
     }
@@ -159,11 +162,15 @@ public class Customer implements AggregateRoot<CustomerId> {
         return archivedAt;
     }
 
-    public LoyaltyPoint loyaltyPoints() {
+    public LoyaltyPoints loyaltyPoints() {
         return loyaltyPoints;
     }
 
     public Address address() { return address; }
+
+    public Long version() {
+        return version;
+    }
 
     private void setId(CustomerId id) {
         Objects.requireNonNull(id);
@@ -217,7 +224,7 @@ public class Customer implements AggregateRoot<CustomerId> {
         this.archivedAt = archivedAt;
     }
 
-    private void setLoyaltyPoints(LoyaltyPoint loyaltyPoints) {
+    private void setLoyaltyPoints(LoyaltyPoints loyaltyPoints) {
         Objects.requireNonNull(loyaltyPoints);
         this.loyaltyPoints = loyaltyPoints;
     }
@@ -231,6 +238,10 @@ public class Customer implements AggregateRoot<CustomerId> {
         if (Boolean.TRUE.equals(this.isArchived())) {
             throw new CustomerArchivedException();
         }
+    }
+
+    private void setVersion(Long version) {
+        this.version = version;
     }
 
     @Override

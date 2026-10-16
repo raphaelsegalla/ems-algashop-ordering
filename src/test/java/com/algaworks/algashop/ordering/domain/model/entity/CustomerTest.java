@@ -5,7 +5,7 @@ import com.algaworks.algashop.ordering.domain.model.valueobject.Address;
 import com.algaworks.algashop.ordering.domain.model.valueobject.Document;
 import com.algaworks.algashop.ordering.domain.model.valueobject.Email;
 import com.algaworks.algashop.ordering.domain.model.valueobject.FullName;
-import com.algaworks.algashop.ordering.domain.model.valueobject.LoyaltyPoint;
+import com.algaworks.algashop.ordering.domain.model.valueobject.LoyaltyPoints;
 import com.algaworks.algashop.ordering.domain.model.valueobject.Phone;
 import com.algaworks.algashop.ordering.domain.model.valueobject.ZipCode;
 import org.junit.jupiter.api.Test;
@@ -82,10 +82,10 @@ class CustomerTest {
     void given_brandNewCustomer_whenAddLoyaltyPoints_ShouldSumPoints() {
         Customer customer = CustomerTestDataBuilder.brandNewCustomer().build();
 
-        customer.addLoyaltyPoints(new LoyaltyPoint(20));
-        customer.addLoyaltyPoints(new LoyaltyPoint(10));
+        customer.addLoyaltyPoints(new LoyaltyPoints(20));
+        customer.addLoyaltyPoints(new LoyaltyPoints(10));
 
-        assertThat(customer.loyaltyPoints()).isEqualTo(new LoyaltyPoint(30));
+        assertThat(customer.loyaltyPoints()).isEqualTo(new LoyaltyPoints(30));
 
     }
 
@@ -94,10 +94,10 @@ class CustomerTest {
         Customer customer = CustomerTestDataBuilder.brandNewCustomer().build();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> customer.addLoyaltyPoints(new LoyaltyPoint(0)));
+                .isThrownBy(() -> customer.addLoyaltyPoints(new LoyaltyPoints(0)));
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> customer.addLoyaltyPoints(new LoyaltyPoint(-10)));
+                .isThrownBy(() -> customer.addLoyaltyPoints(new LoyaltyPoints(-10)));
 
     }
 
