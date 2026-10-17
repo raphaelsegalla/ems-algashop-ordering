@@ -50,17 +50,17 @@ public class CustomerPersistenceEntity {
     private Boolean archived;
     private OffsetDateTime registeredAt;
     private OffsetDateTime archivedAt;
+
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "street", column = @Column(name = "address_street")),
-            @AttributeOverride(name = "number", column = @Column(name = "address_number")),
-            @AttributeOverride(name = "complement", column = @Column(name = "address_complement")),
-            @AttributeOverride(name = "neighborhood", column = @Column(name = "address_neighborhood")),
-            @AttributeOverride(name = "city", column = @Column(name = "address_city")),
-            @AttributeOverride(name = "state", column = @Column(name = "address_state")),
-            @AttributeOverride(name = "zipCode", column = @Column(name = "address_zipCode"))
-    })
+    @AttributeOverride(name = "street", column = @Column(name = "address_street"))
+    @AttributeOverride(name = "number", column = @Column(name = "address_number"))
+    @AttributeOverride(name = "complement", column = @Column(name = "address_complement"))
+    @AttributeOverride(name = "neighborhood", column = @Column(name = "address_neighborhood"))
+    @AttributeOverride(name = "city", column = @Column(name = "address_city"))
+    @AttributeOverride(name = "state", column = @Column(name = "address_state"))
+    @AttributeOverride(name = "zipCode", column = @Column(name = "address_zipCode"))
     private AddressEmbeddable address;
+
     private Integer loyaltyPoints;
 
     @Version
