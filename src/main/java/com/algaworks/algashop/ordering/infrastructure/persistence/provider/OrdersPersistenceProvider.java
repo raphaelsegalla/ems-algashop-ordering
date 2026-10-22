@@ -2,6 +2,8 @@ package com.algaworks.algashop.ordering.infrastructure.persistence.provider;
 
 import com.algaworks.algashop.ordering.domain.model.entity.Order;
 import com.algaworks.algashop.ordering.domain.model.repository.Orders;
+import com.algaworks.algashop.ordering.domain.model.valueobject.Money;
+import com.algaworks.algashop.ordering.domain.model.valueobject.id.CustomerId;
 import com.algaworks.algashop.ordering.domain.model.valueobject.id.OrderId;
 import com.algaworks.algashop.ordering.infrastructure.persistence.assembler.OrderPersistenceEntityAssembler;
 import com.algaworks.algashop.ordering.infrastructure.persistence.disassembler.OrderPersistenceEntityDisassembler;
@@ -15,7 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.time.Year;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -54,6 +59,28 @@ public class OrdersPersistenceProvider implements Orders {
     @Override
     public long count() {
         return persistenceRepository.count();
+    }
+
+    @Override
+    public List<Order> placedByCustomerInYear(CustomerId customerId, Year year) {
+//        OffsetDateTime startDate = year.atDay(1).atStartOfDay().atOffset(ZoneOffset.UTC);
+//        OffsetDateTime endDate = startDate.plusYears(1).minusNanos(1);
+//
+//        List<OrderPersistenceEntity> entities = persistenceRepository.findByCustomer_IdAndPlacedAtBetween(customerId.value(), startDate, endDate);
+
+        List<OrderPersistenceEntity> entities = persistenceRepository.placedByCustomerInYear(customerId.value(), year.getValue());
+
+        return entities.stream().map(disassembler::toDomainEntity).collect(Collectors.toList());
+    }
+
+    @Override
+    public long salesQuantityByCustomerInYear(CustomerId customerId, Year year) {
+        return persistenceRepository.salesQuantityByCustomerInYear(customerId.value(), year.getValue());
+    }
+
+    @Override
+    public Money totalSoldForCustomer(CustomerId customerId) {
+        return new Money(persistenceRepository.totalSoldForCustomer(customerId.value()));
     }
 
     private void update(Order aggregateRoot, OrderPersistenceEntity persistenceEntity) {

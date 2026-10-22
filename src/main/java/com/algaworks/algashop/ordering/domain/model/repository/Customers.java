@@ -7,6 +7,6 @@ import com.algaworks.algashop.ordering.domain.model.valueobject.id.CustomerId;
 import java.util.Optional;
 
 public interface Customers extends Repository<Customer, CustomerId> {
-
     Optional<Customer> ofIEmail(Email email);
+    boolean isEmailUnique(Email email, CustomerId exceptCustomerId);
 }
